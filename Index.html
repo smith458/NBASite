@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <script src='https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js'></script>
+  <style src="libraries/jquery.dataTables.min.css"></style>
+  <script src="libraries/jquery.dataTables.min.js"></script>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ" crossorigin="anonymous">
+  <script>
+    var ApiCall = function() {
+      $.ajax({
+        type: 'GET',
+        url: 'https://stats.nba.com/stats/draftcombinestats/?LeagueID=00&SeasonYear=2015-16',
+        dataType: 'jsonp'
+      }).done(function (data) {
+          console.log(data);
+          var headRow = data.resultSets[0].headers;
+          var dataRows = data.resultSets[0].rowSet;
+
+          var table = document.getElementById("statTable");
+          var header = table.createTHead();
+          var row = header.insertRow();
+          var cell;
+          
+          for (x = 0; x < headRow.length; x++){
+            cell = row.insertCell();
+            cell.innerHTML = headRow[x];
+          }
+          
+          var body = table.createTBody();
+          for (x = 0; x < dataRows.length; x++){
+            row = body.insertRow();
+            for (y = 0; y < dataRows[0].length; y++){
+              cell = row.insertCell();
+              cell.innerHTML = dataRows[x][y];
+            }
+          }
+
+          $('#statTable').DataTable();
+        });
+    }
+
+    var HelloWorld = function() {
+      console.log("Go!")
+    }
+
+    $(document).ready( function () {
+      //
+    } );
+  </script>
+</head>
+<body onload="ApiCall()">
+  <table id="statTable" class="display"></table>
+</body>
+    
+</body>
