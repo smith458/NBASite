@@ -6,37 +6,61 @@
   <script src="libraries/jquery.dataTables.min.js"></script>
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ" crossorigin="anonymous">
   <script>
+    //Header Declarations
+    const SEASON = 0;
+    const PLAYER_ID = 1;
+    const FIRST_NAME = 2;
+    
+    const YEAR_OPTIONS = [ "2016-17", "2015-16", "2014-15", "2013-14", "2012-13", "2011-12", "2010-11",
+                           "2009-10", "2008-09", "2007-08", "2006-07", "2005-06", "2004-05", "2003-04",
+                           "2002-03", "2001-02", "2000-01"];
+    
+    var setup = function() {
+      // Add options to dropdown
+      var dropDown = document.getElementById("years");
+      for (var i = 0; i < YEAR_OPTIONS.length; i++){
+        var option = document.createElement('option');
+        option.text = option.value = YEAR_OPTIONS[i];
+        dropDown.add(option);
+      }
+
+      ApiCall();
+    }
+
     var ApiCall = function() {
       $.ajax({
         type: 'GET',
-        url: 'https://stats.nba.com/stats/draftcombinestats/?LeagueID=00&SeasonYear=2015-16',
+        url: 'https://stats.nba.com/stats/draftcombinestats/?LeagueID=00&SeasonYear=' + $('#years').val(),
         dataType: 'jsonp'
       }).done(function (data) {
-          console.log(data);
-          var headRow = data.resultSets[0].headers;
-          var dataRows = data.resultSets[0].rowSet;
+        console.log(data);
+        var headRow = data.resultSets[0].headers;
+        var dataRows = data.resultSets[0].rowSet;
 
-          var table = document.getElementById("statTable");
-          var header = table.createTHead();
-          var row = header.insertRow();
-          var cell;
+        var table = document.getElementById("statTable");
+        var header = table.createTHead();
+        var row = header.insertRow();
+        var cell;
           
-          for (x = 0; x < headRow.length; x++){
+        for (x = 0; x < headRow.length; x++){
+          cell = row.insertCell();
+          cell.innerHTML = headRow[x];
+        }
+        
+        var body = table.createTBody();
+        for (x = 0; x < dataRows.length; x++){
+          row = body.insertRow();
+          for (y = 0; y < dataRows[0].length; y++){
             cell = row.insertCell();
-            cell.innerHTML = headRow[x];
+            cell.innerHTML = dataRows[x][y];
           }
-          
-          var body = table.createTBody();
-          for (x = 0; x < dataRows.length; x++){
-            row = body.insertRow();
-            for (y = 0; y < dataRows[0].length; y++){
-              cell = row.insertCell();
-              cell.innerHTML = dataRows[x][y];
-            }
-          }
-
-          $('#statTable').DataTable();
+        }
+        $('#statTable').DataTable({
+          "bPaginate": false,
+          "bInfo": false,
+          "searching": false
         });
+      }); 
     }
 
     var HelloWorld = function() {
@@ -48,8 +72,10 @@
     } );
   </script>
 </head>
-<body onload="ApiCall()">
-  <table id="statTable" class="display"></table>
+<body onload="setup()">
+  <select id="years" name="years"></select>
+  <input type="button" value="Select" onclick="ApiCall()">
+  <table id="statTable" class="table display"></table>
 </body>
     
 </body>
